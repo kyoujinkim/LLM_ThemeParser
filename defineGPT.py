@@ -159,7 +159,7 @@ class GptAgent:
         #check if keyword_doc's token length is less than 8192
         self.keyword_doc = self.__cut_doc(self.keyword_doc, 4086)
 
-    def run(self, company_code, company_name, top_n: int = 3):
+    def run(self, company_code, company_name, buss_detail_path: str='data/buss_detail', top_n: int = 3, news_window: str ='180d'):
         prompt = self.__get_prompt()
         model = ChatOpenAI(model=self.model
                            , openai_api_key=self.API_KEY
@@ -170,7 +170,7 @@ class GptAgent:
 
         output = None
         if self.type == 'headline':
-            document = self.__cut_doc(self.gn.parse(company_name, when='180d'), 8000)
+            document = self.__cut_doc(self.gn.parse(company_name, when=news_window), 8000)
 
             output = chain.invoke({
                 "input_lang": self.input_lang
@@ -181,7 +181,7 @@ class GptAgent:
             })
 
         elif self.type == 'document':
-            bus_det = pd.read_json(f'./data/buss_detail/{company_code}.json', typ='series')
+            bus_det = pd.read_json(f'./{buss_detail_path}/{company_code}.json', typ='series')
             doc = bus_det.detail[company_code]
             text_list = self.splitter.split_text(doc)
             ranked_text_list = self.reranker.rerank(self.keyword_doc, text_list)
@@ -209,12 +209,12 @@ if __name__ == '__main__':
     input_lang = 'ko'
 
     '''Type Business Document'''
-    typeinfo = 'document'# 'document' or 'headline
+    typeinfo = 'headline'# 'document' or 'headline
     agent = GptAgent(OPENAI_API_KEY
                      , type=typeinfo # 'document' or 'headline'
                      , input_lang=input_lang
                      , model="gpt-4o-mini"
-                     , rerankerModel='upskyy/ko-reranker')
+                     , rerankerModel='Alibaba-NLP/gte-multilingual-reranker-base')
     agent.set_theme(theme=theme, theme_key=theme_key, use_summary=False)
 
     company = 'A005930'

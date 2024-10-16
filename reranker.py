@@ -15,8 +15,9 @@ class reRanker:
     Update: Alibaba-NLP/gte-multilingual-reranker-base model is used for this class
     '''
     def __init__(self, hf_model='Dongjin-kr/ko-reranker', **kwargs):
+        device = 'cuda' if torch.cuda.is_available() else 'cpu'
         self.tokenizer = AutoTokenizer.from_pretrained(hf_model)
-        self.model = AutoModelForSequenceClassification.from_pretrained(hf_model, **kwargs)
+        self.model = AutoModelForSequenceClassification.from_pretrained(hf_model, **kwargs).to(torch.device(device))
         self.model.eval()
 
     def __make_pair(self, query, docs):
