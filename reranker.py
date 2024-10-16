@@ -27,7 +27,7 @@ class reRanker:
 
     def scoring(self, pairs):
         with torch.no_grad():
-            inputs = self.tokenizer(pairs, padding=True, truncation=True, return_tensors='pt', max_lenght=2048)
+            inputs = self.tokenizer(pairs, padding=True, truncation=True, return_tensors='pt', max_length=2048)
             inputs = {k: v.to(self.model.device) for k, v in inputs.items()}
             scores = self.model(**inputs, return_dict=True).logits.view(-1, ).float()
             scores = exp_normalize(scores.cpu().numpy())
