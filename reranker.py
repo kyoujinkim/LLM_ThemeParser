@@ -16,7 +16,7 @@ class reRanker:
     '''
     def __init__(self, hf_model='Dongjin-kr/ko-reranker', device='cpu', **kwargs):
         self.tokenizer = AutoTokenizer.from_pretrained(hf_model)
-        self.model = AutoModelForSequenceClassification.from_pretrained(hf_model, **kwargs).to(torch.device(device))
+        self.model = AutoModelForSequenceClassification.from_pretrained(hf_model, device_map=device, **kwargs).to(torch.device(device))
         self.model.eval()
 
     def __make_pair(self, query, docs):
@@ -27,9 +27,10 @@ class reRanker:
 
     def scoring(self, pairs):
         with torch.no_grad():
-            inputs = self.tokenizer(pairs, padding=True, truncation=True, return_tensors='pt', max_length=512)
+            inputs = self.tokenizer(pairs, padding=True, truncation=True, return_tensors='pt')
+            inputs = {k: v.to(self.model.device) for k, v in inputs.items()}
             scores = self.model(**inputs, return_dict=True).logits.view(-1, ).float()
-            scores = exp_normalize(scores.numpy())
+            scores = exp_normalize(scores.cpu().numpy())
             return scores
 
     def rerank(self, query: str, docs: [list], top_k: int = 10):
