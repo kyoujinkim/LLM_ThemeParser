@@ -25,6 +25,7 @@ class GptAgent:
                  , rerankerModel: str = 'Alibaba-NLP/gte-multilingual-reranker-base'
                  , chunk_size: int = 2000
                  , overlap: int = 200
+                 , device: str = 'cpu'
                  ):
         '''
         GPT Agent for analysis of correlation between theme keyword and company
@@ -57,6 +58,7 @@ class GptAgent:
         self.reranker = reRanker(rerankerModel
                                  , trust_remote_code=True
                                  , torch_dtype=torch.float16
+                                 , device=device
                                  )
 
         self.splitter = RecursiveCharacterTextSplitter(chunk_overlap=overlap, chunk_size=chunk_size)
@@ -214,7 +216,8 @@ if __name__ == '__main__':
                      , type=typeinfo # 'document' or 'headline'
                      , input_lang=input_lang
                      , model="gpt-4o-mini"
-                     , rerankerModel='Alibaba-NLP/gte-multilingual-reranker-base')
+                     , rerankerModel='Alibaba-NLP/gte-multilingual-reranker-base'
+                     , device='cuda')
     agent.set_theme(theme=theme, theme_key=theme_key, use_summary=False)
 
     company = 'A005930'

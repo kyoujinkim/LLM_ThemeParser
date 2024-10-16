@@ -14,8 +14,7 @@ class reRanker:
     Reranker class for re-ranking documents based on the query
     Update: Alibaba-NLP/gte-multilingual-reranker-base model is used for this class
     '''
-    def __init__(self, hf_model='Dongjin-kr/ko-reranker', **kwargs):
-        device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    def __init__(self, hf_model='Dongjin-kr/ko-reranker', device='cpu', **kwargs):
         self.tokenizer = AutoTokenizer.from_pretrained(hf_model)
         self.model = AutoModelForSequenceClassification.from_pretrained(hf_model, **kwargs).to(torch.device(device))
         self.model.eval()
