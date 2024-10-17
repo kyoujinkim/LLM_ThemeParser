@@ -146,7 +146,7 @@ class GptAgent:
 
         return doc
 
-    def set_theme(self, theme, theme_key, use_summary=True, theme_doc:str=None):
+    def set_theme(self, theme, theme_key, use_summary=True, ispath:bool=False):
         '''
         Set theme keyword and document about theme keyword
         :param theme: 테마명
@@ -156,18 +156,20 @@ class GptAgent:
         :return:
         '''
         self.keyword = theme
-        if theme_doc is not None:
-            if os.path.exists(theme_doc):
-                with open('data/밸류업.txt', encoding='UTF-8-sig') as f:
+        if ispath:
+            if os.path.exists(theme_key):
+                with open(theme_key, encoding='UTF-8-sig') as f:
                     self.keyword_doc = f.read()
             else:
-                raise FileNotFoundError(f"File not found : {theme_doc}(parameter should be full path)")
-
-        if use_summary:
-            self.keyword_doc = self.wiki.get_page(theme_key).summary
+                raise FileNotFoundError(f"File not found : {theme_key}(parameter should be full path)")
         else:
-            self.keyword_doc = self.wiki.get_page(theme_key).text
-        #check if keyword_doc's token length is less than 8192
+            if use_summary:
+                self.keyword_doc = self.wiki.get_page(theme_key).summary
+            else:
+                self.keyword_doc = self.wiki.get_page(theme_key).text
+            #check if keyword_doc's token length is less than 8192
+        if len(self.keyword_doc) < 10: # if keyword_doc is empty, raise error
+            raise ValueError("keyword_doc is empty")
         self.keyword_doc = self.__cut_doc(self.keyword_doc, 4086)
 
     def run(self, company_code, company_name, buss_detail_path: str='data/buss_detail', top_n: int = 3, news_window: str ='180d'):
