@@ -14,8 +14,8 @@ class scrapWiki():
 
 if __name__ == "__main__":
     wiki = scrapWiki()
-    page = wiki.get_page('2차전지산업')
+    page = wiki.get_page('도널드 트럼프')
     print(page.text)
-    print(page.summary)
-    print(page.fullurl)
-    print(page.exists())
+    #print(page.summary)
+    #print(page.fullurl)
+    #print(page.exists())

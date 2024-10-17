@@ -1,4 +1,5 @@
 import configparser
+import os.path
 
 import pandas as pd
 import torch
@@ -33,7 +34,7 @@ class GptAgent:
         :param type: headline or document
         :param input_lang: 'ko' or 'en'
         :param model: OpenAI GPT 모델명
-        :param rerankerModel: reranker 모델명
+        :param rerankerModel: reranker 모델명 ['upskyy/ko-reranker-8k' - 27GB, 'Alibaba-NLP/gte-multilingual-reranker-base']
         :param chunk_size: 문서를 나눌 때의 chunk size
         :param overlap: 문서를 나눌 때의 overlap
         '''
@@ -145,15 +146,23 @@ class GptAgent:
 
         return doc
 
-    def set_theme(self, theme, theme_key, use_summary=True):
+    def set_theme(self, theme, theme_key, use_summary=True, theme_doc:str=None):
         '''
         Set theme keyword and document about theme keyword
         :param theme: 테마명
         :param theme_key: 테마 키워드(위키피디아 검색을 위한 것)
         :param use_summary: 위키피디아에서 서머리만 사용할지 전문을 사용할지 여부
+        :param theme_doc: 테마에 대한 문서 path
         :return:
         '''
         self.keyword = theme
+        if theme_doc is not None:
+            if os.path.exists(theme_doc):
+                with open('data/밸류업.txt', encoding='UTF-8-sig') as f:
+                    self.keyword_doc = f.read()
+            else:
+                raise FileNotFoundError(f"File not found : {theme_doc}(parameter should be full path)")
+
         if use_summary:
             self.keyword_doc = self.wiki.get_page(theme_key).summary
         else:
