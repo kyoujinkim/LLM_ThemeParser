@@ -184,7 +184,8 @@ class GptAgent:
         output = None
         if self.type == 'headline':
             document = self.__cut_doc(self.gn.parse(company_name, when=news_window), 8000)
-
+            print(document)
+            
             output = chain.invoke({
                 "input_lang": self.input_lang
                 , "keyword": self.keyword
@@ -199,7 +200,7 @@ class GptAgent:
             text_list = self.splitter.split_text(doc)
             ranked_text_list = self.reranker.rerank(self.keyword_doc, text_list)
             document = '. '.join(ranked_text_list[:top_n])
-
+            print(ranked_text_list[:top_n])
             output = chain.invoke({
                 "input_lang": self.input_lang
                 , "keyword": self.keyword
